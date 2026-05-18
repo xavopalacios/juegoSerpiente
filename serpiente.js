@@ -14,6 +14,8 @@ let intervaloSerpiente = null;
 let direccionActual = "derecha";
 let comida = { x: 5, y: 5 };
 let puntajeActual = 0;
+let velocidad = 180;
+let juegoTerminado = false;
 
 dibujarTodo();
 
@@ -78,9 +80,39 @@ function generarComida() {
   comida.y = Math.floor(Math.random() * filas);
 }
 
+function verificarColisiones(nuevaCabeza) {
+  const columnas = canvas.width / TAMANIO_CELDA;
+  const filas = canvas.height / TAMANIO_CELDA;
+
+  if (nuevaCabeza.x < 0 || nuevaCabeza.x >= columnas || nuevaCabeza.y < 0 || nuevaCabeza.y >= filas) {
+    return true;
+  }
+
+  for (let i = 0; i < serpiente.length; i++) {
+    if (serpiente[i].x === nuevaCabeza.x && serpiente[i].y === nuevaCabeza.y) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function finalizarJuego() {
+  pausarJuego();
+  juegoTerminado = true;
+  document.getElementById("estado").innerText = "GAME OVER";
+  document.getElementById("mensaje").innerText = "Colisión detectada. Núcleo comprometido.";
+}
+
 function moverDerecha() {
   const cabeza = serpiente[0];
   const nuevaCabeza = { x: cabeza.x + 1, y: cabeza.y };
+
+  if (verificarColisiones(nuevaCabeza)) {
+    finalizarJuego();
+    return;
+  }
+
   serpiente.unshift(nuevaCabeza);
   if (!atrapaComida()) {
     serpiente.pop();
@@ -92,6 +124,12 @@ function moverDerecha() {
 function moverIzquierda() {
   const cabeza = serpiente[0];
   const nuevaCabeza = { x: cabeza.x - 1, y: cabeza.y };
+
+  if (verificarColisiones(nuevaCabeza)) {
+    finalizarJuego();
+    return;
+  }
+
   serpiente.unshift(nuevaCabeza);
   if (!atrapaComida()) {
     serpiente.pop();
@@ -103,6 +141,12 @@ function moverIzquierda() {
 function moverArriba() {
   const cabeza = serpiente[0];
   const nuevaCabeza = { x: cabeza.x, y: cabeza.y - 1 };
+
+  if (verificarColisiones(nuevaCabeza)) {
+    finalizarJuego();
+    return;
+  }
+
   serpiente.unshift(nuevaCabeza);
   if (!atrapaComida()) {
     serpiente.pop();
@@ -114,6 +158,12 @@ function moverArriba() {
 function moverAbajo() {
   const cabeza = serpiente[0];
   const nuevaCabeza = { x: cabeza.x, y: cabeza.y + 1 };
+
+  if (verificarColisiones(nuevaCabeza)) {
+    finalizarJuego();
+    return;
+  }
+
   serpiente.unshift(nuevaCabeza);
   if (!atrapaComida()) {
     serpiente.pop();
@@ -123,6 +173,7 @@ function moverAbajo() {
 }
 
 function cambiarDireccion(direccion) {
+  if (juegoTerminado) return;
   if (direccion === "arriba" && direccionActual !== "abajo") direccionActual = "arriba";
   if (direccion === "abajo" && direccionActual !== "arriba") direccionActual = "abajo";
   if (direccion === "izquierda" && direccionActual !== "derecha") direccionActual = "izquierda";
@@ -130,17 +181,21 @@ function cambiarDireccion(direccion) {
 }
 
 function moverSerpiente() {
+  if (juegoTerminado) return;
+
   if (direccionActual === "derecha") moverDerecha();
   else if (direccionActual === "izquierda") moverIzquierda();
   else if (direccionActual === "arriba") moverArriba();
   else if (direccionActual === "abajo") moverAbajo();
   
-  dibujarTodo();
+  if (!juegoTerminado) {
+    dibujarTodo();
+  }
 }
 
 function iniciarJuego() {
-  if (!intervaloSerpiente) {
-    intervaloSerpiente = setInterval(moverSerpiente, 150);
+  if (!intervaloSerpiente && !juegoTerminado) {
+    intervaloSerpiente = setInterval(moverSerpiente, velocidad);
     document.getElementById("estado").innerText = "Jugando";
     document.getElementById("mensaje").innerText = "Sistema en ejecución.";
   }
@@ -150,8 +205,10 @@ function pausarJuego() {
   if (intervaloSerpiente) {
     clearInterval(intervaloSerpiente);
     intervaloSerpiente = null;
-    document.getElementById("estado").innerText = "Pausado";
-    document.getElementById("mensaje").innerText = "Sistema en pausa.";
+    if (!juegoTerminado) {
+      document.getElementById("estado").innerText = "Pausado";
+      document.getElementById("mensaje").innerText = "Sistema en pausa.";
+    }
   }
 }
 
@@ -166,6 +223,8 @@ function reiniciarJuego() {
   );
   direccionActual = "derecha";
   puntajeActual = 0;
+  velocidad = 180;
+  juegoTerminado = false;
   document.getElementById("puntaje").innerText = "0";
   generarComida();
   document.getElementById("estado").innerText = "Listo";
@@ -181,6 +240,15 @@ function atrapaComida() {
 function procesarComida() {
   puntajeActual += 10;
   document.getElementById("puntaje").innerText = puntajeActual;
+
+  if (puntajeActual % 30 === 0 && velocidad > 60) {
+    velocidad -= 20;
+    if (intervaloSerpiente) {
+      clearInterval(intervaloSerpiente);
+      intervaloSerpiente = setInterval(moverSerpiente, velocidad);
+    }
+  }
+
   generarComida();
 }
 
