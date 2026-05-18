@@ -1,142 +1,288 @@
+/* ==========================================================================
+   ESTILOS JUEGO DE LA SERPIENTE - DISEÑO TECNOLÓGICO Y RESPONSIVO
+   ========================================================================== */
+
+:root {
+    --bg-main: #060913;
+    --bg-card: rgba(13, 20, 38, 0.6);
+    --bg-canvas: #02040a;
+    --border-color: rgba(56, 189, 248, 0.2);
+    --neon-cyan: #38bdf8;
+    --neon-green: #22c55e;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --font-cyber: 'Courier New', Courier, monospace;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    color: white;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(at 50% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(34, 197, 94, 0.05) 0px, transparent 40%);
+    color: var(--text-primary);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: clamp(10px, 4vw, 24px);
+    overflow-x: hidden;
 }
 
 .contenedor-juego {
     width: 100%;
-    max-width: 720px;
-    background: #111827;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    max-width: 600px;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: clamp(16px, 5vw, 32px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
 h1 {
-    margin-bottom: 10px;
-    font-size: 32px;
-    color: #22c55e;
+    margin-bottom: 6px;
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #ffffff, var(--neon-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .descripcion {
-    margin-bottom: 18px;
-    color: #cbd5e1;
-    line-height: 1.5;
+    margin-bottom: 24px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
 }
 
+/* Panel de Información - Estilo Dashboard */
 .panel-info {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .tarjeta-info {
     flex: 1;
-    min-width: 150px;
-    background: #1f2937;
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid #374151;
+    background: rgba(2, 4, 10, 0.4);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.tarjeta-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
 }
 
 .tarjeta-info span {
     display: block;
-    font-size: 14px;
-    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
     margin-bottom: 4px;
+    font-weight: 600;
 }
 
 .tarjeta-info strong {
-    font-size: 24px;
-    color: #facc15;
+    font-family: var(--font-cyber);
+    font-size: 26px;
+    color: var(--text-primary);
 }
+
+#puntaje {
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+#estado {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
 
 canvas {
     width: 100%;
-    max-width: 500px;
-    background: #020617;
-    border: 4px solid #22c55e;
+    max-width: 500px; 
+    height: auto;
+    aspect-ratio: 1 / 1;
+    background: var(--bg-canvas);
+    border: 2px solid rgba(56, 189, 248, 0.4);
     border-radius: 16px;
     display: block;
     margin: 0 auto 20px auto;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+    image-rendering: pixelated; 
 }
 
+
+/* Teclado de Controles Táctiles (Responsivo) */
 .controles {
     display: grid;
-    grid-template-columns: repeat(3, 90px);
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(65px, 80px));
+    gap: 12px;
     justify-content: center;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
 }
 
-.controles button,
-.acciones button {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    background: #22c55e;
-    color: #052e16;
-    font-weight: bold;
+.controles button {
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.8);
+    font-size: 20px;
+    color: var(--text-primary);
     cursor: pointer;
-    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.controles button:hover,
-.acciones button:hover {
-    transform: scale(1.05);
-    background: #86efac;
+.controles button:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    transform: translateY(-2px);
+}
+
+.controles button:active {
+    transform: translateY(1px);
 }
 
 .vacio {
     visibility: hidden;
+    pointer-events: none;
 }
 
+/* Botones de Acción de Sistema */
 .acciones {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 16px;
 }
 
+.acciones button {
+    flex: 1;
+    max-width: 160px;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Botón Iniciar (Primario Verde) */
+.acciones button:not(.secundario) {
+    background: var(--neon-green);
+    color: #022c22;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+.acciones button:not(.secundario):hover {
+    background: #4ade80;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Botón Reiniciar (Secundario Cian) */
 .acciones .secundario {
-    background: #38bdf8;
-    color: #082f49;
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: inset 0 0 0 0 rgba(56, 189, 248, 0.1);
 }
 
+.acciones .secundario:hover {
+    background: rgba(56, 189, 248, 0.1);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.2);
+    transform: translateY(-2px);
+}
+
+.acciones button:active {
+    transform: translateY(1px);
+}
+
+/* Consola de Mensajes Inferior */
 .mensaje {
-    margin-top: 14px;
-    color: #e2e8f0;
+    margin-top: 24px;
+    font-family: var(--font-cyber);
+    font-size: 13px;
+    color: var(--text-secondary);
     min-height: 24px;
-    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 16px;
 }
 
-@media (max-width: 520px) {
-    h1 {
-        font-size: 24px;
+/* ==========================================================================
+   OPTIMIZACIONES DE RESPONSIVIDAD (MÓVILES)
+   ========================================================================== */
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+    
+    .contenedor-juego {
+        border-radius: 20px;
+    }
+
+    .panel-info {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .tarjeta-info {
+        padding: 10px;
+    }
+
+    .tarjeta-info strong {
+        font-size: 22px;
+    }
+
+    canvas {
+        margin-bottom: 16px;
     }
 
     .controles {
-        grid-template-columns: repeat(3, 75px);
+        grid-template-columns: repeat(3, minmax(55px, 68px));
+        gap: 8px;
+        margin-bottom: 16px;
     }
 
-    .controles button,
+    .controles button {
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
     .acciones button {
-        padding: 10px;
+        padding: 12px 16px;
+        font-size: 13px;
     }
 }
